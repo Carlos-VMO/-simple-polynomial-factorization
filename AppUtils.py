@@ -11,15 +11,15 @@ def find_dividers(num_):
 
 
 def get_zeros_from_quadratic_equation(a, b, c):
-    return [(-b + cmath.sqrt(b * b - 4 * a * c)) / 2 * a, (-b - cmath.sqrt(b * b - 4 * a * c)) / 2 * a]
+    return [(-b + cmath.sqrt((b * b) - (4 * a * c))) / (2 * a), (-b - cmath.sqrt((b * b) - (4 * a * c))) / (2 * a)]
 
 
-def greather_than_zero(item):
+def greather_or_equal_than_zero(item):
     return item >= 0
 
 
-def substract_one(item):
-    return item - 1
+def substract(item, num):
+    return item - num
 
 
 def print_object(obj_):

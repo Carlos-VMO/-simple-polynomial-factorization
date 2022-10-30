@@ -33,9 +33,20 @@ class FactorablePolynomial:
         if terms_coefficients is None: self.__terms_coefficients = self.initial_terms_coefficients
         if degrees is None: self.__degrees = self.initial_degrees
         if factorable_factors is None: self.factorable_factors = []
+        last_degree = self.__degrees[-1:][0]
+        if last_degree != 0:
+            self.__degrees = list(map(lambda n: AppUtils.substract(n, last_degree), self.__degrees))
+            self.factorable_factors.extend([[[1, 0], [1, 0]]])
         magic_term = self.__get_synthetic_division_magic_term()
         if magic_term.residue == 0:
-            self.__degrees = list(filter(AppUtils.greather_than_zero, map(AppUtils.substract_one, self.__degrees)))
+            self.__degrees = list(
+                filter(
+                    AppUtils.greather_or_equal_than_zero,
+                    map(
+                        lambda n: AppUtils.substract(n, 1),
+                        self.__degrees)
+                )
+            )
             self.__terms_coefficients = magic_term.residues[0:self.__degrees.index(0) + 1]
             self.factorable_factors.extend([
                 [self.__terms_coefficients, self.__degrees],
@@ -84,13 +95,11 @@ class FactorablePolynomial:
         return SyntheticDivisionMagicTermResult(magic_term, residue, residues)
 
     def __apply_quadratic_equation(self):
-        if len(self.factorable_factors) > 0:
-            self.unfactorable_factors.append(self.factorable_factors[0])
-            self.factorable_factors.pop(0)
-            a = self.__terms_coefficients[0]
-            b = self.__terms_coefficients[1]
-            c = self.__terms_coefficients[2]
-            return AppUtils.get_zeros_from_quadratic_equation(a, b, c)
-        else:
-            print('Este polinomio no se puede factorizar por división sentética o ecuación cuadrática')
-            return None
+        unfactorable_factor = [self.__terms_coefficients, self.__degrees]
+        self.unfactorable_factors.append(unfactorable_factor)
+        if unfactorable_factor in self.factorable_factors:
+            self.factorable_factors.remove(unfactorable_factor)
+        a = self.__terms_coefficients[0]
+        b = self.__terms_coefficients[1]
+        c = self.__terms_coefficients[2]
+        return AppUtils.get_zeros_from_quadratic_equation(a, b, c)
