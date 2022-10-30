@@ -17,22 +17,21 @@ class FactorablePolynomial:
             self,
             terms_coefficients,
             degrees,
-            factorable_factors=None,
-            unfactorable_factors=None
+            possible_factorable_factors=None,
+            possible_unfactorable_factors=None
     ):
         self.initial_terms_coefficients = terms_coefficients
         self.__terms_coefficients = terms_coefficients
         self.initial_degrees = degrees
         self.__degrees = degrees
         self.polynomial_degree = max(degrees)
-        if factorable_factors is None: self.factorable_factors = []
-        if unfactorable_factors is None:  self.unfactorable_factors = []
-        self.factor_polynomial()
+        if possible_factorable_factors is None: self.factorable_factors = []
+        if possible_unfactorable_factors is None:  self.unfactorable_factors = []
 
-    def factor_polynomial(self, terms_coefficients=None, degrees=None, factorable_factors=None):
+    def factor_polynomial(self, terms_coefficients=None, degrees=None, possible_factorable_factors=None):
         if terms_coefficients is None: self.__terms_coefficients = self.initial_terms_coefficients
         if degrees is None: self.__degrees = self.initial_degrees
-        if factorable_factors is None: self.factorable_factors = []
+        if possible_factorable_factors is None: self.factorable_factors = []
         last_degree = self.__degrees[-1:][0]
         if last_degree != 0:
             self.__degrees = list(map(lambda n: AppUtils.substract(n, last_degree), self.__degrees))
@@ -57,6 +56,10 @@ class FactorablePolynomial:
             else:
                 return self.factorable_factors
         else:
+            unfactorable_factor = [self.__terms_coefficients, self.__degrees]
+            self.unfactorable_factors.extend(unfactorable_factor)
+            if unfactorable_factor in self.factorable_factors:
+                self.factorable_factors.remove(unfactorable_factor)
             return None
 
     def get_zeros_by_factorization(self):
@@ -71,6 +74,14 @@ class FactorablePolynomial:
             zeros.extend(self.__apply_quadratic_equation())
         zeros.extend(self.get_zeros_by_factorization())
         return zeros
+
+    def get_factors(self):
+        factors = []
+        for factor in self.factorable_factors:
+            factors.append(factor)
+        for factor in self.unfactorable_factors:
+            factors.append(factor)
+        return factors
 
     def __synthetic_division(self, divider_):
         residue = self.__terms_coefficients[0]
@@ -95,10 +106,6 @@ class FactorablePolynomial:
         return SyntheticDivisionMagicTermResult(magic_term, residue, residues)
 
     def __apply_quadratic_equation(self):
-        unfactorable_factor = [self.__terms_coefficients, self.__degrees]
-        self.unfactorable_factors.append(unfactorable_factor)
-        if unfactorable_factor in self.factorable_factors:
-            self.factorable_factors.remove(unfactorable_factor)
         a = self.__terms_coefficients[0]
         b = self.__terms_coefficients[1]
         c = self.__terms_coefficients[2]
